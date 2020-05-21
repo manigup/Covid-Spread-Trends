@@ -1,0 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap");
+
+.map,
+#detail {
+  display: flex;
+  justify-content: center;
+}
+
+#detail {
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 20px;
+  color: #e23028;
+  font-family: "Balsamiq Sans", cursive;
+}
