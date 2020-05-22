@@ -3,8 +3,12 @@
 app.factory("DataService", function ($http) {
   const factory = {};
 
-  factory.getMapStats = function () {
-    return $http.get(`${BASE_URL}/data.json`);
+  factory.getMapStats = async function () {
+    return await $http.get(`${BASE_URL}/data.json`);
+  };
+
+  factory.getStatesTestData = async function () {
+    return await $http.get(`${BASE_URL}/state_test_data.json`);
   };
 
   return factory;

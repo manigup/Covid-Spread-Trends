@@ -1,4 +1,7 @@
 <div ng-init="OnInit()">
-    <div id="detail">Details Come Here</div>
-    <div id="svgcontainer" class="map"></div>
+
+    <div ng-include="'/src/template/map-stats.html'"></div>
+
+    <div id="detail" ng-style="{color:caseColor(caseType)}">Total</div>
+    <div id="map-explorer" class="map"></div>
 </div>

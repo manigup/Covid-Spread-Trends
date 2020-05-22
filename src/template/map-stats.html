@@ -1,32 +1,38 @@
+<div class="header">
+    <h1>India Map</h1>
+    <h6>Hover over states for more details</h6>
+</div>
+
 <div class="map-stats">
-    <div class="stats red focused">
+    <div class="stats red focused" ng-click="mapStatsClick($event , 'confirmed')">
         <h5>Confirmed</h5>
         <div class="stats-bottom">
-            <h1>1,02,564</h1>
+            <h1>{{totalStatsData.confirmed | number }}</h1>
         </div>
     </div>
-    <div class="stats blue">
+    <div class="stats blue" ng-click="mapStatsClick($event , 'active')">
         <h5>Active</h5>
         <div class="stats-bottom">
-            <h1>59,715</h1>
+            <h1>{{totalStatsData.active | number }}</h1>
         </div>
     </div>
-    <div class="stats green">
+    <div class="stats green" ng-click="mapStatsClick($event, 'recovered')">
         <h5>Recovered</h5>
         <div class="stats-bottom">
-            <h1>39,674</h1>
+            <h1>{{totalStatsData.recovered | number }}</h1>
         </div>
     </div>
-    <div class="stats gray">
+    <div class="stats gray" ng-click="mapStatsClick($event, 'deaths')">
         <h5>Deceased</h5>
         <div class="stats-bottom">
-            <h1>3,169</h1>
+            <h1>{{totalStatsData.deaths | number }}</h1>
         </div>
     </div>
     <div class="stats purple">
         <h5>Tested</h5>
         <div class="stats-bottom">
-            <h1>24,04,267</h1>
+            <h1>{{totalTested | number }}</h1>
+            <h6 class="timestamp">As of {{totalTestedTimestamp | timeStamp}}</h6>
         </div>
     </div>
 </div>

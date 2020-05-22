@@ -1,5 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap");
 
+body {
+  font-family: "Balsamiq Sans", cursive;
+}
+
+.header {
+  margin: 0 auto;
+  text-align: center;
+  color: #6c757d;
+}
+
+.header h1 {
+  font-size: 24px;
+}
+
+.header h6 {
+  font-size: 11px;
+}
+
+.header h1,
+.header h6 {
+  margin: 10px 0px 10px 0px;
+}
+
 .map,
 #detail {
   display: flex;
@@ -10,6 +33,68 @@
   align-items: center;
   margin-bottom: 30px;
   font-size: 20px;
-  color: #e23028;
-  font-family: "Balsamiq Sans", cursive;
+  font-weight: 600;
+}
+
+.timestamp,
+.stats-bottom h1,
+.map-stats .stats h5 {
+  margin: 0;
+}
+
+.map-stats {
+  display: flex;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.stats-bottom {
+  margin-top: 5px;
+}
+
+.stats-bottom h1 {
+  font-size: 1.3em;
+  font-weight: bolder;
+}
+
+.map-stats .stats h5 {
+  font-size: 14px;
+}
+
+.map-stats .stats.red {
+  background: rgba(255, 7, 58, 0.12549);
+  color: rgba(255, 7, 58, 0.6);
+}
+
+.map-stats .stats.blue {
+  background: rgba(0, 123, 255, 0.0627451);
+  color: rgba(0, 123, 255, 0.6);
+}
+
+.map-stats .stats.green {
+  background: rgba(40, 167, 69, 0.12549);
+  color: rgba(40, 167, 69, 0.6);
+}
+
+.map-stats .stats.gray {
+  background: rgba(108, 117, 125, 0.0627451);
+  color: rgba(108, 117, 125, 0.6);
+}
+
+.map-stats .stats.purple {
+  background: rgba(32, 26, 162, 0.12549);
+  color: rgba(32, 26, 162, 0.6);
+}
+
+.map-stats .stats.focused {
+  box-shadow: 8px 8px 6px -6px #dcdcdc;
+  border: 1px solid;
+}
+
+.map-stats .stats {
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+  padding: 0.8rem;
+  margin: 0.25rem 0.25rem 20px 0.25rem;
 }

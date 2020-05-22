@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "angular": "^1.7.9",
-    "angular-route": "^1.7.9"
+    "angular-route": "^1.7.9",
+    "d3": "^5.16.0",
+    "topojson": "^3.0.2"
   }
 }
