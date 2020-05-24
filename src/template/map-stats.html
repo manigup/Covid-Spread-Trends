@@ -1,6 +1,6 @@
 <div class="header">
-    <h1>India Map</h1>
-    <h6>Hover over states for more details</h6>
+    <h1>{{mapType}} Map</h1>
+    <h6>Hover over {{viewType}} for more details</h6>
 </div>
 
 <div class="map-stats">
@@ -22,10 +22,10 @@
             <h1>{{totalStatsData.recovered | number }}</h1>
         </div>
     </div>
-    <div class="stats gray" ng-click="mapStatsClick($event, 'deaths')">
+    <div class="stats gray" ng-click="mapStatsClick($event, viewType === 'states' ? 'deaths' : 'deceased' )">
         <h5>Deceased</h5>
         <div class="stats-bottom">
-            <h1>{{totalStatsData.deaths | number }}</h1>
+            <h1>{{totalStatsData.deaths || totalStatsData.deceased  | number }}</h1>
         </div>
     </div>
     <div class="stats purple">

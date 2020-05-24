@@ -1,5 +1,12 @@
 const BASE_URL = "https://api.covid19india.org";
 const MAPS_DIR = "/mini_maps";
+const SCALE_COLORS = {
+  confirmed: d3.interpolateReds,
+  active: d3.interpolateBlues,
+  recovered: d3.interpolateGreens,
+  deaths: d3.interpolateGreys,
+  deceased: d3.interpolateGreys,
+};
 const MAP_META = {
   "Andaman and Nicobar Islands": {
     geoDataFile: `${MAPS_DIR}/andamannicobarislands.json`,

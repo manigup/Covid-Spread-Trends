@@ -11,5 +11,9 @@ app.factory("DataService", function ($http) {
     return await $http.get(`${BASE_URL}/state_test_data.json`);
   };
 
+  factory.getStateDistrictWiseData = async function () {
+    return await $http.get(`${BASE_URL}/state_district_wise.json`);
+  };
+
   return factory;
 });

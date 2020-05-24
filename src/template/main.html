@@ -2,6 +2,10 @@
 
     <div ng-include="'/src/template/map-stats.html'"></div>
 
-    <div id="detail" ng-style="{color:caseColor(caseType)}">Total</div>
+    <div class="meta">
+        <div id="detail" ng-style="{color:caseColor(caseType)}">Total</div>
+        <button ng-click="drawStatesMap()" class="backBtn" ng-show="viewType === 'district'">Back</button>
+    </div>
+
     <div id="map-explorer" class="map"></div>
 </div>

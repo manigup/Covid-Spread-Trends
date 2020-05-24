@@ -3,30 +3,55 @@
 app.controller("Main", function ($scope, DataService) {
   let statsData = {};
   let statesTestData = {};
+  let stateDistrict = {};
   let india;
+  const w = 650;
+  const h = 650;
+  $scope.viewType = "states";
+  $scope.mapType = "India";
   $scope.caseType = "confirmed";
 
-  function getTotalStats(data) {
+  const getTotalStatsState = (data) => {
     $scope.totalStatsData = data.statewise[0];
     $scope.totalTested =
       statsData.tested[data.tested.length - 1].totalsamplestested;
     $scope.totalTestedTimestamp =
       statsData.tested[data.tested.length - 1].updatetimestamp;
-  }
+  };
 
-  const colorInterpolator = (caseType, t) => {
-    switch (caseType) {
-      case "confirmed":
-        return d3.interpolateReds(t);
-      case "active":
-        return d3.interpolateBlues(t * 0.85);
-      case "recovered":
-        return d3.interpolateGreens(t * 0.85);
-      case "deaths":
-        return d3.interpolateGreys(t * 0.85);
-      default:
-        return;
-    }
+  const getTotalStatsDistrict = () => {
+    $scope.totalStatsData = statsData.statewise.find(
+      (item) => item.state === $scope.mapType
+    );
+  };
+
+  const fillStates = (d) => {
+    const max = Math.max.apply(
+      null,
+      statsData.statewise.map(function (item) {
+        return parseInt(item[$scope.caseType]);
+      })
+    );
+    const state = statsData.statewise.find((item) => item.state === d.id);
+    return {
+      max: max,
+      ...state,
+    };
+  };
+
+  const fillDistricts = () => {
+    const district = stateDistrict[$scope.mapType].districtData;
+    const districts = Object.keys(district).map((i) => district[i]);
+    const max = Math.max.apply(
+      null,
+      districts.map(function (item) {
+        return parseInt(item[$scope.caseType]);
+      })
+    );
+    return {
+      max: max,
+      ...district,
+    };
   };
 
   $scope.caseColor = (caseType) => {
@@ -38,25 +63,10 @@ app.controller("Main", function ($scope, DataService) {
       case "recovered":
         return "#28a745";
       case "deaths":
+      case "deceased":
         return "#6c757d";
       default:
         return;
-    }
-  };
-
-  const colorShade = (number) => {
-    if (number <= 400) {
-      return 0.1;
-    } else if (number <= 1000) {
-      return 0.2;
-    } else if (number <= 3000) {
-      return 0.3;
-    } else if (number <= 10000) {
-      return 0.4;
-    } else if (number <= 20000) {
-      return 0.6;
-    } else {
-      return 0.8;
     }
   };
 
@@ -64,8 +74,15 @@ app.controller("Main", function ($scope, DataService) {
     DataService.getMapStats().then(
       function (success) {
         statsData = success.data;
-        getTotalStats(statsData);
+        getTotalStatsState(statsData);
         drawMap();
+      },
+      function (error) {}
+    );
+
+    DataService.getStateDistrictWiseData().then(
+      function (success) {
+        stateDistrict = success.data;
       },
       function (error) {}
     );
@@ -85,33 +102,52 @@ app.controller("Main", function ($scope, DataService) {
       children[i].classList.remove("focused");
     }
     evt.currentTarget.classList.add("focused");
-    india.selectAll("path").style("fill", function (d, i) {
-      let state = statsData.statewise.find((item) => item.state === d.id);
-      return colorInterpolator(
-        $scope.caseType,
-        colorShade(parseInt(state[$scope.caseType]))
-      );
-    }).attr("stroke", $scope.caseColor($scope.caseType));
+    if ($scope.viewType === "states") {
+      india
+        .selectAll("path")
+        .style("fill", function (d) {
+          const fill = fillStates(d);
+          const color = d3
+            .scaleSequential()
+            .domain([0, fill.max])
+            .interpolator(SCALE_COLORS[$scope.caseType]);
+          return color(parseInt(fill[$scope.caseType]));
+        })
+        .attr("stroke", $scope.caseColor($scope.caseType));
+    } else {
+      india
+        .selectAll("path")
+        .style("fill", function (d) {
+          const fill = fillDistricts(d);
+          const color = d3
+            .scaleSequential()
+            .domain([0, fill.max === 0 ? 1 : fill.max])
+            .interpolator(SCALE_COLORS[$scope.caseType]);
+          return color(parseInt(fill[d.properties.district][$scope.caseType]));
+        })
+        .attr("stroke", $scope.caseColor($scope.caseType));
+    }
   };
 
-  function drawMap() {
-    d3.json("https://www.covid19india.org/mini_maps/india.json").then(function (
-      data
-    ) {
-      var w = 650;
-      var h = 650;
-      var map = d3
+  const changeMap = () => {
+    d3.select("#map-explorer").html("");
+    d3.json(
+      "https://www.covid19india.org" + MAP_META[$scope.mapType].geoDataFile
+    ).then(function (data) {
+      let map = d3
         .select("#map-explorer")
         .append("svg")
         .attr("width", w)
-        .attr("height", h);
+        .attr("height", h)
+        .style("filter", "saturate(2)")
+        .attr("viewBox", `0 0 ${w} ${h}`);
       const topology = topojson.feature(
         data,
-        data.objects["india-states" || "india-districts-2019-734"]
+        data.objects[MAP_META[$scope.mapType].graphObjectDistricts]
       );
       const projection = d3.geoMercator().fitSize([w, h], topology);
       const path = d3.geoPath(projection);
-      india = map.append("svg:g").attr("id", "india");
+      india = map.append("svg:g").attr("id", $scope.mapType);
       var div = d3.select("#detail");
       india
         .selectAll("path")
@@ -120,26 +156,96 @@ app.controller("Main", function ($scope, DataService) {
         .append("path")
         .attr("d", path)
         .style("cursor", "pointer")
-        .style("fill", function (d, i) {
-          let state = statsData.statewise.find((item) => item.state === d.id);
-          return colorInterpolator(
-            $scope.caseType,
-            colorShade(parseInt(state[$scope.caseType]))
-          );
+        .style("fill", function (d) {
+          const fill = fillDistricts(d);
+          const color = d3
+            .scaleSequential()
+            .domain([0, fill.max === 0 ? 1 : fill.max])
+            .interpolator(SCALE_COLORS[$scope.caseType]);
+          return color(parseInt(fill[d.properties.district][$scope.caseType]));
         })
         .attr("stroke", $scope.caseColor($scope.caseType))
         .attr("stroke-opacity", 1)
         .attr("stroke-width", 1)
-        .on("click", (d, i) => {
-          changeMap(d.properties, i);
-        })
-        .on("mouseleave", function (d, i) {
+        .on("mouseleave", function () {
           d3.select(this).attr("stroke-opacity", 1).attr("stroke-width", 1);
           div.text("Total");
-          getTotalStats(statsData);
+          getTotalStatsDistrict();
           $scope.$apply();
         })
-        .on("mouseenter", function (d, i) {
+        .on("mouseenter", function (d) {
+          div.text(d.properties.district);
+          d3.select(this).attr("stroke-opacity", 9).attr("stroke-width", 3);
+          $scope.totalStatsData =
+            stateDistrict[$scope.mapType].districtData[d.properties.district];
+          $scope.$apply();
+        });
+    });
+  };
+
+  $scope.drawStatesMap = () => {
+    $scope.viewType = "states";
+    $scope.mapType = "India";
+    $scope.caseType =
+      $scope.caseType === "deceased" ? "deaths" : $scope.caseType;
+    getTotalStatsState(statsData);
+    drawMap();
+  };
+
+  const drawMap = () => {
+    d3.select("#map-explorer").html("");
+    d3.json("https://www.covid19india.org/mini_maps/india.json").then(function (
+      data
+    ) {
+      let map = d3
+        .select("#map-explorer")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .style("filter", "saturate(2)")
+        .attr("viewBox", `0 0 ${w} ${h}`);
+      const topology = topojson.feature(
+        data,
+        data.objects["india-states" || "india-districts-2019-734"]
+      );
+      const projection = d3.geoMercator().fitSize([w, h], topology);
+      const path = d3.geoPath(projection);
+      india = map.append("svg:g").attr("id", $scope.mapType);
+      var div = d3.select("#detail");
+      india
+        .selectAll("path")
+        .data(topology.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("cursor", "pointer")
+        .style("fill", function (d) {
+          const fill = fillStates(d);
+          const color = d3
+            .scaleSequential()
+            .domain([0, fill.max])
+            .interpolator(SCALE_COLORS[$scope.caseType]);
+          return color(parseInt(fill[$scope.caseType]));
+        })
+        .attr("stroke", $scope.caseColor($scope.caseType))
+        .attr("stroke-opacity", 1)
+        .attr("stroke-width", 1)
+        .on("click", (d) => {
+          div.text("Total");
+          $scope.viewType = "district";
+          $scope.mapType = d.properties.st_nm;
+          $scope.caseType =
+            $scope.caseType === "deaths" ? "deceased" : $scope.caseType;
+          $scope.$apply();
+          changeMap();
+        })
+        .on("mouseleave", function () {
+          d3.select(this).attr("stroke-opacity", 1).attr("stroke-width", 1);
+          div.text("Total");
+          getTotalStatsState(statsData);
+          $scope.$apply();
+        })
+        .on("mouseenter", function (d) {
           d3.select(this).attr("stroke-opacity", 9).attr("stroke-width", 3);
           div.text(d.id);
           $scope.totalStatsData = statsData.statewise.find(
@@ -154,5 +260,5 @@ app.controller("Main", function ($scope, DataService) {
           $scope.$apply();
         });
     });
-  }
+  };
 });
