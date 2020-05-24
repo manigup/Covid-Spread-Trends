@@ -1,2 +1,2 @@
-> Covid Spread Trends
+> **Covid Spread Trends**.
  
