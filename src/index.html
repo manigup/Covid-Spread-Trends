@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="spread_trend">
+
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covid - Spread Trends</title>
+    <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular-route/angular-route.min.js"></script>
+    <script src="scripts/d3/dist/d3.min.js"></script>
+    <script src="scripts/topojson/dist/topojson.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="app.js"></script>
+    <script src="contants.js"></script>
+    <script src="formatter.js"></script>
+    <script src="service.js"></script>
+    <script src="controller/main.js"></script>
+    <link rel="icon" href="img/covid_icon.png">
+</head>
+
+<body>
+    <ng-view></ng-view>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 "use strict";
 
 app.controller("Main", function ($scope, DataService) {
+
   let statsData = {};
   let statesTestData = {};
   let stateDistrict = {};
